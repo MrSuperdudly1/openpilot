@@ -99,7 +99,6 @@ class SelfdriveD(CruiseHelper):
     self.car_state_sock = messaging.sub_sock('carState', timeout=20)
 
     ignore = self.sensor_packets + self.gps_packets + ['alertDebug']
-    ignore += ['driverCameraState', 'managerState', 'driverMonitoringState']
     if SIMULATION:
       ignore += ['driverCameraState', 'managerState']
     if REPLAY:
@@ -335,7 +334,7 @@ class SelfdriveD(CruiseHelper):
     else:
       if not SIMULATION and not self.rk.lagging:
         if not self.sm.all_alive(self.camera_packets):
-          pass#self.events.add(EventName.cameraMalfunction)
+          self.events.add(EventName.cameraMalfunction)
         elif not self.sm.all_freq_ok(self.camera_packets):
           self.events.add(EventName.cameraFrameRate)
     if not REPLAY and self.rk.lagging:
@@ -359,11 +358,11 @@ class SelfdriveD(CruiseHelper):
     no_system_errors = (not has_disable_events) or (len(self.events) == num_events)
     if not self.sm.all_checks() and no_system_errors:
       if not self.sm.all_alive():
-        pass#self.events.add(EventName.commIssue)
+        self.events.add(EventName.commIssue)
       elif not self.sm.all_freq_ok():
-        pass#self.events.add(EventName.commIssueAvgFreq)
+        self.events.add(EventName.commIssueAvgFreq)
       else:
-        pass#self.events.add(EventName.commIssue)
+        self.events.add(EventName.commIssue)
 
       logs = {
         'invalid': [s for s, valid in self.sm.valid.items() if not valid],
